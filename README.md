@@ -1,4 +1,6 @@
 Inanna
 ======
 
-A txt to mobi converter with the capability to detect text structure.
+Inanna是一个.txt到.mobi的文本转换器，主要用于将小说转换到kindle上的格式以供阅读。
+
+Inanna不仅仅是一个文本格式转换器，它还会尝试自动解析文本结构，从而使得转换后的mobi文件能够带有目录。
