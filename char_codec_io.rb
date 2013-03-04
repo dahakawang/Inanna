@@ -18,23 +18,23 @@ module Inanna
       @specified_enc = nil
     end
 
-    def decodeFromFile(file)
+    def decode_from_file(file)
       data = IO.binread(file)
 
       # guess the encoding
-      guessed = guessEncoding(data)
+      guessed = guess_encoding(data)
       raise EncodingNotDetectError, "Cannot detect character encodings" if guessed == "UNKNOWN"
 
       # convert to utf8 
       @last_encoding = guessed
-      data = stripSignature(data, guessed)
+      data = strip_signature(data, guessed)
       data.force_encoding(guessed)
       data.encode!("UTF-8", {:invalid => :replace, :undef => :replace, :replace => '?'})
 
       data
     end
 
-    def encodeToFile(file, data, encoding = "UTF-8")
+    def encode_to_file(file, data, encoding = "UTF-8")
       converted = data.encode(encoding, 
             {:invalid => :replace, 
               :undef => :replace, 
@@ -43,11 +43,11 @@ module Inanna
       IO.binwrite(file, converted, encoding)
     end
 
-    def specifyEncoding(encoding)
+    def specify_encoding(encoding)
       @specified_enc = encoding
     end
 
-    def guessEncoding(str)
+    def guess_encoding(str)
       return @specified_enc if @specified_enc
 
       str.force_encoding("ASCII-8BIT")
@@ -62,7 +62,7 @@ module Inanna
       "UNKNOWN"
     end
 
-    def stripSignature(str, encoding)
+    def strip_signature(str, encoding)
       signature = SUPPORTED_ENCODINGS[encoding]
       if signature
         return str[(signature.length)..(str.length - 1)]
