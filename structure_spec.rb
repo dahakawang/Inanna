@@ -8,6 +8,7 @@ module Inanna
   class DefaultSpec
     include Singleton
 
+    # TODO bug fix : "sdfas卷adsfa" will be matched?
     DIGITS = '\d+|[０１２３４５６７８９]+|[一两兩二三四五六七八九壹贰叁肆伍陆柒捌玖]?[万萬]?零?[一两兩二三四五六七八九壹贰叁肆伍陆柒捌玖]?[千仟]?零?[一两兩二三四五六七八九壹贰叁肆伍陆柒捌玖]?[百佰]?零?[一二三四五六七八九壹贰叁肆伍陆柒捌玖]?[十拾]?零?[零一二三四五六七八九壹贰叁肆伍陆柒捌玖]?'
 
     DEFAULT_SPEC = 
@@ -28,6 +29,8 @@ module Inanna
     
     attr_reader :level_count
     attr_reader :levels
+    attr_reader :paragraph_level
+    attr_reader :top_level
 
     def load_specification(filePath = nil)
       if filePath
@@ -39,6 +42,8 @@ module Inanna
       spec = YAML.load(spec_str)
       @level_count = spec[:level_count]
       @levels = spec[:levels]
+      @paragraph_level = @level_count + 1
+      @top_level = 0
     end
   end
 end

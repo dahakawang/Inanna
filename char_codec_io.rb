@@ -40,7 +40,7 @@ module Inanna
               :undef => :replace, 
               :replace => '?'})
 
-      IO.binwrite(file, converted, encoding)
+      File.write(file, converted)
     end
 
     def specify_encoding(encoding)
