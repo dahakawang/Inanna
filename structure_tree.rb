@@ -6,12 +6,15 @@ require 'singleton'
 module Inanna
   class StructureTreeNode
 
-    attr_accessor :content  # utf-8 string
-    attr_reader :children    # children StructureTree in order
+    attr_accessor :content    # utf-8 string
+    attr_reader :children     # children StructureTree in order
+    attr_reader :level        # the level of current node
 
-    def initialize(content)
+    def initialize(content, level = -1)
       Support::ensure_utf8(content)
 
+      @level = level
+      @level = StructureSpec.instance.top_level if level == -1
       @content = content
       @children = []
     end
@@ -21,11 +24,19 @@ module Inanna
     end
 
     def refine_content(range)
-      @content = @content[range]
+      if range.first > range.last
+        @content = ""
+      else
+        @content = @content[range]
+      end
     end
 
     def children_count
       @children.length
+    end
+
+    def set_children(children)
+      @children = children
     end
   end
 
@@ -33,8 +44,8 @@ module Inanna
     include Singleton
 
     def build_tree(text)
-      book = StructureTreeNode.new(text)
-      parse_levels_recursively(0, book)
+      book = StructureTreeNode.new(text, StructureSpec.instance.top_level)
+      parse_levels_recursively(StructureSpec.instance.top_level, book)
 
       book
     end
@@ -51,7 +62,7 @@ module Inanna
       0.upto(result.length - 2) do |i| #we pushed an extra element so substract 2 here
         subrange = (result[i][0])..(result[i+1][0] - 1)
         child_content = node.content[subrange]
-        child = StructureTreeNode.new(child_content)
+        child = StructureTreeNode.new(child_content, level)
         node.append_child(child)
       end
       node.refine_content(0..(result[0][0] - 1))

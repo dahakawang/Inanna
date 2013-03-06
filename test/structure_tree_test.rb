@@ -148,7 +148,7 @@ module Inanna
       stb = StructureTreeBuilder.instance
 
       book = StructureTreeNode.new(SAMPLE_TEXT)
-      stb.parse_levels_recursively 0, book
+      stb.parse_levels_recursively spec.top_level, book
 
       assert_equal 5, book.children_count
       assert_equal 3, book.children[0].children_count
@@ -159,6 +159,10 @@ module Inanna
 
       str = '第四章 湿漉漉的黑色枝条'
       assert_equal str, book.children[2].children[3].content[0,str.length]
+
+      assert_equal 1, book.children[0].level
+      assert_equal 2, book.children[0].children[0].level
+
     end
 
   end
