@@ -30,9 +30,13 @@ module Inanna
       regexp = Regexp.new spec.levels[spec.level_count]
       match = regexp.match(node.content)
       
-      title = match[0]
-      candidate = node.content.lines.next # the first line 
-      title = candidate if(candidate.length <= @title_length)
+      if match
+        title = match[0]
+        candidate = node.content.lines.next # the first line 
+        title = candidate if(candidate.length <= @title_length)
+      else
+        title = ""
+      end
 
       body_node = StructureTreeNode.new(node.content[(title.length)..(node.content.length - 1)], node.level+1)
       node.content = title.strip
