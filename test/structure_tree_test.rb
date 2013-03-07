@@ -164,6 +164,5 @@ module Inanna
       assert_equal 2, book.children[0].children[0].level
 
     end
-
   end
 end

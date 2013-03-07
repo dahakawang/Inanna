@@ -133,7 +133,7 @@ module Inanna
     end
   end
 
-  class TestChapterTitleExtractProcessor < Test::Unit::TestCase
+  class TestParagraphExtraxtProcessor < Test::Unit::TestCase
     def test_process
       spec = StructureSpec.instance
       spec.load_specification(nil)
