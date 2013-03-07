@@ -6,7 +6,7 @@ require "char_codec_io"
 require 'structure_tree'
 require 'tree_serializer'
 require 'tree_processors'
-require 'ruby-debug'
+
 module Inanna
 
   spec = StructureSpec.instance
