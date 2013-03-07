@@ -3,9 +3,8 @@ require 'test/unit'
 require 'tree_processors'
 require 'structure_tree'
 require 'structure_spec'
-require 'ruby-debug'
+
 module Inanna
-  
   SAMPLE_TEXT = 
   <<-eos
   第一卷 现代诗/新诗诞生的背景
@@ -112,6 +111,21 @@ module Inanna
   起码要了解一种文学风格、文学体裁的诞生背景和发展脉络才能更好地阅读作品。
   eos
 
+  SAMPLE_TEXT2 = 
+  <<-eos
+  这里是前言前言前言
+  第一卷我们是什么 第一章 我们是what
+  并且这里的东西都是我们算得
+  第二章 测试什么
+  我们都有222
+  第二卷
+  卷首语here
+  第一章 测试章
+  我们也不知道
+  第二章 没有章
+  dahaka is here
+  eos
+
   class TestChapterTitleExtractProcessor < Test::Unit::TestCase
     def test_process
       spec = StructureSpec.instance
@@ -150,6 +164,48 @@ module Inanna
       
       assert_equal 3, novel_tree.children[0].children[2].children_count
       assert_equal "新诗本身就是对旧诗的一次否定式的突破——如果脱离了这个语境去对比现代诗和古典诗歌，那么新诗的地位会被严重低估", novel_tree.children[0].children[2].children[2].content
+    end
+  end
+
+  class TestTreeNormalizeProcessor < Test::Unit::TestCase
+    def test_process
+      spec = StructureSpec.instance
+      spec.load_specification(nil)
+
+      novel_tree = StructureTreeBuilder.instance.build_tree(SAMPLE_TEXT)
+
+      processor = TreeNormalizeProcessor.instance
+      processor.config
+      processor.process(novel_tree)
+
+      assert_equal "第一章 文学形式", novel_tree.children[0].children[0].content
+      assert_equal "第三章  艺术的敏感性", novel_tree.children[2].children[2].content
+
+      assert_equal 1, novel_tree.children[0].children[0].children_count
+      assert_equal 1, novel_tree.children[2].children[5].children_count
+      assert_equal spec.paragraph_level, novel_tree.children[0].children[0].children[0].level
+      assert_equal spec.paragraph_level, novel_tree.children[2].children[5].children[0].level
+    end
+
+    def test_process_with_SAMPLE2
+      spec = StructureSpec.instance
+      spec.load_specification(nil)
+
+      novel_tree = StructureTreeBuilder.instance.build_tree(SAMPLE_TEXT2)
+
+      processor = TreeNormalizeProcessor.instance
+      processor.config
+      processor.process(novel_tree)
+
+      assert_equal 3, novel_tree.children_count
+      assert_equal "", novel_tree.children[0].content
+      assert_equal "", novel_tree.children[0].children[0].content
+      assert_equal "这里是前言前言前言", novel_tree.children[0].children[0].children[0].content.strip
+
+      assert_equal "第二卷", novel_tree.children[2].content
+      assert_equal "", novel_tree.children[2].children[0].content
+      assert_equal "卷首语here", novel_tree.children[2].children[0].children[0].content.strip
+
     end
   end
 end

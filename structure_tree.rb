@@ -19,6 +19,10 @@ module Inanna
       @children = []
     end
 
+    def unshift_child(child)
+      @children.unshift(child)
+    end
+
     def append_child(child)
       @children.push(child)
     end
@@ -29,6 +33,10 @@ module Inanna
       else
         @content = @content[range]
       end
+    end
+
+    def set_content(content)
+      @content = content
     end
 
     def children_count

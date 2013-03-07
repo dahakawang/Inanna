@@ -4,6 +4,8 @@ require 'structure_tree'
 require 'structure_spec'
 
 module Inanna
+  # This class is deprecated
+  # use TreeNormalizeProcessor instead
   class ChapterTitleExtractProcessor
     include Singleton
 
@@ -29,6 +31,7 @@ module Inanna
       spec = StructureSpec.instance
       regexp = Regexp.new spec.levels[spec.level_count]
       match = regexp.match(node.content)
+      title = nil
       
       if match
         title = match[0]
@@ -74,6 +77,73 @@ module Inanna
       end
 
       root.set_children(children)
+    end
+  end
+
+  class TreeNormalizeProcessor
+    include Singleton
+
+    def config(param = {})
+      @title_length = param[:title_length] || 20
+    end
+
+    def process(root)
+     do_normalize(root)
+    end
+
+    def do_normalize(root)
+      # we do postorder traversal here to retain the text's literal order
+      root.children.each do |child|
+        do_normalize(child)
+      end
+      normalize_node(root)
+    end
+
+    def normalize_node(node)
+      spec = StructureSpec.instance
+      title, content = extrct_title_body(node)
+
+      node.set_content(title)
+      if content.strip != ""
+        parent = node
+
+        # we'll build stub nodes from current level downto paragraph level
+        from = node.level + 1
+        from.upto(spec.level_count) do |level|
+          node = StructureTreeNode.new("", level)
+          parent.unshift_child(node)
+          parent = node
+        end
+
+        normalized_body = StructureTreeNode.new(content, spec.paragraph_level)
+        parent.unshift_child(normalized_body)
+      end
+    end
+
+    # the node should never be a paragraph level
+    def extrct_title_body(node)
+      spec = StructureSpec.instance
+      raise RuntimeError, "extrct_title_body do not accept a paragraph node" if node.level == spec.paragraph_level
+
+      if node.level == spec.top_level
+        return "", node.content
+      else
+        regexp = Regexp.new spec.levels[node.level]
+        match = regexp.match(node.content)
+        title = nil
+
+        if match
+          # TODO parse title by space not by line
+          title = match[0]
+          candidate = node.content.lines.next # the first line 
+          title = candidate if(candidate.length <= @title_length)
+        else # the stub node will not have title
+          title = ""
+        end
+
+        content = node.content[(title.length)..(node.content.length - 1)]
+        return title.strip, content
+      end
     end
   end
 end
