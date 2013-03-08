@@ -10,7 +10,7 @@ module Inanna
     include Singleton
 
     TAGS = {
-      0 => "HTML",
+      0 => "BODY",
       1 => "H1",
       2 => "H2",
       3 => "H3",
@@ -29,6 +29,7 @@ module Inanna
     end
 
     def traversal_tree(node, stream)
+      stream << "HTML"
       stream << open_tag_for(node)
 
       node.children.each do |child|
@@ -36,6 +37,7 @@ module Inanna
       end
 
       stream << close_tag_for(node)
+      stream << "/HTML"
     end
 
     def traversal_tree_impl(node, stream)
