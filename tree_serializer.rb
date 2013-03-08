@@ -29,7 +29,8 @@ module Inanna
     end
 
     def traversal_tree(node, stream)
-      stream << "HTML"
+      stream << '<?xml version="1.0" encoding="UTF-8" ?>'
+      stream << '<HTML>'
       stream << open_tag_for(node)
 
       node.children.each do |child|
@@ -37,7 +38,7 @@ module Inanna
       end
 
       stream << close_tag_for(node)
-      stream << "/HTML"
+      stream << '/HTML'
     end
 
     def traversal_tree_impl(node, stream)
