@@ -7,20 +7,29 @@ require 'structure_tree'
 require 'tree_serializer'
 require 'tree_processors'
 
+def print_help
+  puts "Usage: inanna input.txt"
+end
+
 module Inanna
+  if(ARGV.length != 1)
+    print_help
+    abort
+  end
+
 
   spec = StructureSpec.instance
   spec.load_specification(nil)
 
 
   codec = CharCodecIO.new
-  text = codec.decode_from_file("test.txt")
+  text = codec.decode_from_file(ARGV[0])
   codec.last_encoding
 
 
   novel_tree = StructureTreeBuilder.instance.build_tree(text)
   
-  processor = ChapterTitleExtractProcessor.instance
+  processor = TreeNormalizeProcessor.instance
   processor.config
   processor.process(novel_tree)
 
@@ -32,5 +41,5 @@ module Inanna
   ts = TreeSerializer.instance
   html = ts.serialize(novel_tree)
 
-  codec.encode_to_file("out.html", html)
+  codec.encode_to_file("__out.temp.html", html)
 end
